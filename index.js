@@ -194,12 +194,9 @@ app.post('/api/verificar-codigo', async (req, res) => {
     }
 });
 
-// 8. Inicia o Servidor
-
+// 8. Inicia o Servidor (Essa linha agora é um comentário, pois a Vercel lida com isso)
 
 // Rota para o Agente GPT acessar o esquema OpenAPI
-// (Você pode criar um arquivo openapi.yaml e servi-lo estaticamente ou gerá-lo aqui)
-// Para este exemplo, vamos retornar um JSON básico, você pode adaptá-lo para YAML se preferir.
 app.get('/openapi.json', (req, res) => {
     const publicBackendUrl = "https://gpt-backend-navy.vercel.app"; // Sua URL Vercel
     const openApiSchema = {
@@ -211,7 +208,7 @@ app.get('/openapi.json', (req, res) => {
         },
         servers: [
             {
-                url: publicBackendUrl // <-- AGORA USANDO A URL PÚBLICA DA VERCEL
+                url: publicBackendUrl
             }
         ],
         paths: {
@@ -285,18 +282,18 @@ app.get('/openapi.json', (req, res) => {
                                 }
                             }
                         }
+                    },
+                    responses: {
+                        '200': { "description": "Resultado da verificação do código." },
+                        "400": { "description": "Requisição inválida." },
+                        "401": { "description": "Não autorizado (API Key inválida)." },
+                        "500": { "description": "Erro interno do servidor." }
                     }
-                },
-                "responses": {
-                    "200": { "description": "Resultado da verificação do código." },
-                    "400": { "description": "Requisição inválida." },
-                    "401": { "description": "Não autorizado (API Key inválida)." },
-                    "500": { "description": "Erro interno do servidor." }
                 }
             }
         },
         "components": {
-            "schemas": {}, // <-- SEÇÃO 'SCHEMAS' ADICIONADA E VAZIA AQUI!
+            "schemas": {},
             "securitySchemes": {
                 "BearerAuth": {
                     "type": "http",
@@ -314,3 +311,6 @@ app.get('/openapi.json', (req, res) => {
     };
     res.json(openApiSchema);
 });
+
+// ADICIONE ESTA LINHA NO FINAL DO ARQUIVO
+module.exports = app;
