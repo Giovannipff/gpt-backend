@@ -195,28 +195,24 @@ app.post('/api/verificar-codigo', async (req, res) => {
 });
 
 // 8. Inicia o Servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Backend server running on port ${PORT}`);
-    console.log(`OpenAPI schema will be available at YOUR_BACKEND_URL/openapi.yaml`);
-});
+
 
 // Rota para o Agente GPT acessar o esquema OpenAPI
 // (Você pode criar um arquivo openapi.yaml e servi-lo estaticamente ou gerá-lo aqui)
 // Para este exemplo, vamos retornar um JSON básico, você pode adaptá-lo para YAML se preferir.
 app.get('/openapi.json', (req, res) => {
-    const backendUrl = `http://localhost:${PORT}`; // Mudar para a URL pública quando deployar
+    const publicBackendUrl = "https://gpt-backend-navy.vercel.app"; // Sua URL Vercel
     const openApiSchema = {
         openapi: '3.1.0',
         info: {
             title: 'API de Verificação de Compras',
             version: '1.0.0',
-            description: 'API para validar e-mails de compra e gerenciar códigos de verificação.',
+            description: 'API para validar e-mails de compra e gerenciar códigos de verificação.'
         },
         servers: [
             {
-                url: backendUrl, // Esta URL precisa ser a URL pública do seu backend no deploy!
-            },
+                url: publicBackendUrl // <-- AGORA USANDO A URL PÚBLICA DA VERCEL
+            }
         ],
         paths: {
             '/api/validar-email': {
@@ -230,20 +226,20 @@ app.get('/openapi.json', (req, res) => {
                                 schema: {
                                     type: 'object',
                                     properties: {
-                                        email: { type: 'string', format: 'email', description: 'O email de compra a ser validado.' },
+                                        email: { type: 'string', format: 'email', description: 'O email de compra a ser validado.' }
                                     },
-                                    required: ['email'],
-                                },
-                            },
-                        },
+                                    required: ['email']
+                                }
+                            }
+                        }
                     },
                     responses: {
                         '200': { description: 'Resposta da validação do email.' },
                         '400': { description: 'Requisição inválida.' },
                         '401': { description: 'Não autorizado (API Key inválida).' },
-                        '500': { description: 'Erro interno do servidor.' },
-                    },
-                },
+                        '500': { description: 'Erro interno do servidor.' }
+                    }
+                }
             },
             '/api/enviar-codigo-verificacao': {
                 post: {
@@ -256,20 +252,20 @@ app.get('/openapi.json', (req, res) => {
                                 schema: {
                                     type: 'object',
                                     properties: {
-                                        email: { type: 'string', format: 'email', description: 'O email para o qual o código será enviado.' },
+                                        email: { type: 'string', format: 'email', description: 'O email para o qual o código será enviado.' }
                                     },
-                                    required: ['email'],
-                                },
-                            },
-                        },
+                                    required: ['email']
+                                }
+                            }
+                        }
                     },
                     responses: {
                         '200': { description: 'Confirmação de envio do código.' },
                         '400': { description: 'Requisição inválida.' },
                         '401': { description: 'Não autorizado (API Key inválida).' },
-                        '500': { description: 'Erro interno do servidor.' },
-                    },
-                },
+                        '500': { description: 'Erro interno do servidor.' }
+                    }
+                }
             },
             '/api/verificar-codigo': {
                 post: {
@@ -283,37 +279,38 @@ app.get('/openapi.json', (req, res) => {
                                     type: 'object',
                                     properties: {
                                         email: { type: 'string', format: 'email', description: 'O email do usuário.' },
-                                        codigo: { type: 'string', description: 'O código de verificação digitado.' },
+                                        codigo: { type: 'string', description: 'O código de verificação digitado.' }
                                     },
-                                    required: ['email', 'codigo'],
-                                },
-                            },
-                        },
-                    },
-                    responses: {
-                        '200': { description: 'Resultado da verificação do código.' },
-                        '400': { description: 'Requisição inválida.' },
-                        '401': { description: 'Não autorizado (API Key inválida).' },
-                        '500': { description: 'Erro interno do servidor.' },
-                    },
+                                    required: ['email', 'codigo']
+                                }
+                            }
+                        }
+                    }
                 },
-            },
+                "responses": {
+                    "200": { "description": "Resultado da verificação do código." },
+                    "400": { "description": "Requisição inválida." },
+                    "401": { "description": "Não autorizado (API Key inválida)." },
+                    "500": { "description": "Erro interno do servidor." }
+                }
+            }
         },
-        components: {
-            securitySchemes: {
-                BearerAuth: { // Um nome arbitrário para o esquema de segurança
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT', // Embora não seja um JWT real, é um formato comum para tokens bearer
-                    description: 'Autenticação usando um Bearer token (API Key do GPT).'
-                },
-            },
+        "components": {
+            "schemas": {}, // <-- SEÇÃO 'SCHEMAS' ADICIONADA E VAZIA AQUI!
+            "securitySchemes": {
+                "BearerAuth": {
+                    "type": "http",
+                    "scheme": "bearer",
+                    "bearerFormat": "JWT",
+                    "description": "Autenticação usando um Bearer token (API Key do GPT)."
+                }
+            }
         },
-        security: [
+        "security": [
             {
-                BearerAuth: [], // Aplica o esquema BearerAuth a todas as APIs (globally)
-            },
-        ],
+                "BearerAuth": []
+            }
+        ]
     };
     res.json(openApiSchema);
 });
